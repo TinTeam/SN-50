@@ -1,0 +1,18 @@
+fail_fast: true
+
+repos:
+  - repo: local
+    hooks:
+      - id: fmt
+        name: fmt
+        language: system
+        files: '[.]rs$'
+        entry: cargo fmt
+        pass_filenames: false
+
+      - id: clippy
+        name: clippy
+        language: system
+        files: '[.]rs$'
+        entry: cargo clippy
+        pass_filenames: false

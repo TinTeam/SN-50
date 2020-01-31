@@ -1,0 +1,16 @@
+[package]
+name = "tinlib"
+version = "0.1.0"
+authors = ["Luiz F. A. de Prá <rawarkanis@gmail.com>"]
+description = "Components for SN-50 Fantasy Computer implementations."
+homepage = "https://github.com/TinTeam/SN-50/"
+repository = "https://github.com/TinTeam/SN-50/"
+documentation = "https://docs.rs/tinlib/"
+keywords = ["sn-50", "fantasy", "console", "computer"]
+categories = ["games", "game-development", "game-engines"]
+license = "MIT"
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+log = "0.4.8"

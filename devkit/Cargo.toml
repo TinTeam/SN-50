@@ -1,0 +1,16 @@
+[package]
+name = "sn-50"
+version = "0.1.0"
+authors = ["Luiz F. A. de Prá <rawarkanis@gmail.com>"]
+description = "The SN-50 Fantasy Computer with DevKit tools."
+homepage = "https://github.com/TinTeam/SN-50/"
+repository = "https://github.com/TinTeam/SN-50/"
+documentation = "https://docs.rs/sn-50/"
+keywords = ["sn-50", "fantasy", "console", "computer"]
+categories = ["games", "game-development", "game-engines"]
+license = "MIT"
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+tinlib = { version = "0.1.0", path = "../tinlib" }

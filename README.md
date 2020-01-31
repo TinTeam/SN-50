@@ -15,7 +15,7 @@
   </p>
 
   <p align="center">
-    <a href="https://github.com/TinTeam/SN-50"> 
+    <a href="https://github.com/TinTeam/SN-50">
       <img src="images/logo-128x128.png" alt="Logo" width="128px" height="128px">
     </a>
   </p>
@@ -27,9 +27,9 @@
   </p>
 </p>
 
-## Table of Contents <!-- omit in toc --> 
+## Table of Contents <!-- omit in toc -->
 
-- [About SN-80](#about-sn-80)
+- [About SN-50](#about-sn-50)
   - [Tailored Limitations](#tailored-limitations)
   - [Features](#features)
 - [Getting Started](#getting-started)
@@ -38,8 +38,9 @@
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+- [Acknowledgements](#acknowledgements)
 
-## About SN-80
+## About SN-50
 
 SN-50 is a free and open source fantasy computer for building, playing and sharing resources-limited games. The game limitations were inspired in old computers and their text-based games.
 
@@ -66,7 +67,7 @@ You can download all the compiled version os SN-50 in the [release page][release
 Follow these steps to build the project:
 
 **Important:** You must have the latest Rust version installed to build this project.
- 
+
 1. Clone the repo and move to the project's folder
 ```sh
 git clone https://github.com/TinTeam/SN-50.git && cd SN-50
@@ -94,5 +95,8 @@ Contributions are what make the open source community such an amazing place to b
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
+## Acknowledgements
+
+* [Elias "dlight/amiguxo"](https://github.com/dlight/), thank you for helping me solve tricky problems with lifetimes and giving advices.
 
 [releases]: https://github.com/TinTeam/SN-50/releases
