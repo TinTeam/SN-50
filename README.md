@@ -7,7 +7,7 @@
       <img src="https://docs.rs/sn-50/badge.svg" alt="docs.rs">
     </a>
     <a href="https://crates.io/crates/sn-50">
-      <img src="https://img.shields.io/crates/d/sn-50 alt="Crates.io"">
+      <img src="https://img.shields.io/crates/d/sn-50" alt="Crates.io"">
     </a>
     <a href="https://github.com/TinTeam/SN-50/blob/master/LICENSE.txt">
       <img src="https://img.shields.io/github/license/TinTeam/SN-50.svg" alt="MIT License Shield">
