@@ -141,6 +141,8 @@ impl<'tile> fmt::Debug for Map<'tile> {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -198,10 +200,12 @@ mod tests {
         let coord = Coord::new(321, 1);
         let map = Map::default();
 
-        let error = Error::new_invalid_coord(coord, map.size());
         let result = map.get_tile(coord);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidCoord { coord: c, size: s } if c == coord && s == map.size()
+        );
     }
 
     #[test]
@@ -233,10 +237,12 @@ mod tests {
         let mut map = Map::default();
         let tile = Tile::new(&glyph, &color);
 
-        let error = Error::new_invalid_coord(coord, map.size());
         let result = map.set_tile(coord, tile);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidCoord { coord: c, size: s } if c == coord && s == map.size()
+        );
     }
 
     #[test]

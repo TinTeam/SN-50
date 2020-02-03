@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "assert_matches"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
+
+[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -74,6 +80,7 @@ dependencies = [
 name = "tinlib"
 version = "0.1.0"
 dependencies = [
+ "assert_matches",
  "byteorder",
  "log",
  "thiserror",

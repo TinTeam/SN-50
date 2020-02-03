@@ -130,6 +130,8 @@ impl fmt::Debug for Glyph {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -166,10 +168,12 @@ mod tests {
         let coord = Coord::new(9, 1);
         let glyph = Glyph::default();
 
-        let error = Error::new_invalid_coord(coord, glyph.size());
         let result = glyph.get_pixel(coord);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
+        );
     }
 
     #[test]
@@ -191,10 +195,12 @@ mod tests {
         let coord = Coord::new(9, 1);
         let mut glyph = Glyph::default();
 
-        let error = Error::new_invalid_coord(coord, glyph.size());
         let result = glyph.set_pixel(coord, GlyphPixel::Solid);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
+        );
     }
 
     #[test]

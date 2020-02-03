@@ -80,6 +80,8 @@ impl fmt::Debug for Font {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use crate::common::Coord;
     use crate::graphic::glyph::GlyphPixel;
 
@@ -104,17 +106,20 @@ mod tests {
 
         let result = font.get_glyph(0);
         assert!(result.is_ok());
-        assert_eq!(result, Ok(glyph));
+        assert_eq!(result.unwrap(), glyph);
     }
 
     #[test]
     fn test_font_get_glyph_invalid_index() {
         let font = Font::default();
-        let error = Error::new_invalid_index(256, font.lenght());
+        let index = 256usize;
 
-        let result = font.get_glyph(256);
+        let result = font.get_glyph(index);
         assert!(result.is_err());
-        assert_eq!(result, Err(error));
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidIndex { index: i, lenght: l } if i == index && l == font.lenght()
+        );
     }
 
     #[test]
@@ -127,21 +132,24 @@ mod tests {
 
         let result = font.set_glyph(0, new_glyph);
         assert!(result.is_ok());
-        assert_eq!(result, Ok(()));
+        assert_eq!(result.unwrap(), ());
 
         let result = font.get_glyph(0);
-        assert_eq!(result, Ok(new_glyph));
+        assert_eq!(result.unwrap(), new_glyph);
     }
 
     #[test]
     fn test_font_set_glyph_invalid_index() {
         let mut font = Font::default();
         let glyph = Glyph::default();
-        let error = Error::new_invalid_index(256, font.lenght());
+        let index = 256usize;
 
-        let result = font.set_glyph(256, glyph);
+        let result = font.set_glyph(index, glyph);
         assert!(result.is_err());
-        assert_eq!(result, Err(error));
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidIndex { index: i, lenght: l } if i == index && l == font.lenght()
+        );
     }
 
     #[test]

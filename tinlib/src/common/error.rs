@@ -17,10 +17,10 @@ pub enum Error {
     /// Error to represent invalid coords.
     #[error("invalid coord ({coord:?}) for size ({size:?})")]
     InvalidCoord { coord: Coord, size: Size },
-    #[error("test")]
+    #[error("IO operation error")]
     Io(#[from] io::Error),
-    #[error("test2")]
-    Utf8(#[from] FromUtf8Error),
+    #[error("UFT8 conversion error")]
+    FromUtf8(#[from] FromUtf8Error),
 }
 
 impl Error {
@@ -35,43 +35,13 @@ impl Error {
     }
 }
 
-impl PartialEq for Error {
-    fn eq(&self, other: &Self) -> bool {
-        use Error::*;
-
-        match (self, other) {
-            (
-                InvalidIndex {
-                    index: i1,
-                    lenght: l1,
-                },
-                InvalidIndex {
-                    index: i2,
-                    lenght: l2,
-                },
-            ) => i1 == i2 && l1 == l2,
-            (
-                InvalidCoord {
-                    coord: c1,
-                    size: s1,
-                },
-                InvalidCoord {
-                    coord: c2,
-                    size: s2,
-                },
-            ) => c1 == c2 && s1 == s2,
-            (Io(_), Io(_)) => true,
-            (Utf8(_), Utf8(_)) => true,
-            _ => false,
-        }
-    }
-}
-
 /// Internal result.
 pub type Result<T> = StdResult<T, Error>;
 
 #[cfg(test)]
 mod test_super {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -80,9 +50,11 @@ mod test_super {
         let lenght = 1usize;
 
         let error = Error::new_invalid_index(index, lenght);
-        let expected = Error::InvalidIndex { index, lenght };
 
-        assert_eq!(error, expected);
+        assert_matches!(
+            error,
+            Error::InvalidIndex { index: i, lenght: l } if i == index && l == lenght
+        );
     }
 
     #[test]
@@ -91,8 +63,10 @@ mod test_super {
         let size: Size = Size::new(1, 1);
 
         let error = Error::new_invalid_coord(coord, size);
-        let expected = Error::InvalidCoord { coord, size };
 
-        assert_eq!(error, expected);
+        assert_matches!(
+            error,
+            Error::InvalidCoord { coord: c, size: s } if c == coord && s == size
+        );
     }
 }

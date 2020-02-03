@@ -124,6 +124,8 @@ impl fmt::Debug for Screen {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -160,10 +162,12 @@ mod tests {
         let screen = Screen::default();
         let coord = Coord::new(641, 1);
 
-        let error = Error::new_invalid_coord(coord, screen.size());
         let result = screen.get_pixel(coord);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
+        );
     }
 
     #[test]
@@ -187,10 +191,12 @@ mod tests {
         let coord = Coord::new(641, 1);
         let pixel = ScreenPixel::new(255, 255, 255);
 
-        let error = Error::new_invalid_coord(coord, screen.size());
         let result = screen.set_pixel(coord, pixel);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            Error::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
+        );
     }
 
     #[test]
