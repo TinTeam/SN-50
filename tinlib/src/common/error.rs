@@ -11,27 +11,37 @@ use crate::common::size::Size;
 /// Internal errors.
 #[derive(Error, Debug)]
 pub enum Error {
-    /// Error to reprense invalid indexes.
-    #[error("invalid index {index} for lenght {lenght}")]
-    InvalidIndex { index: usize, lenght: usize },
+    /// Error to represent invalid chunk types.
+    #[error("invalid chunk type {0}")]
+    InvalidChunkType(u8),
     /// Error to represent invalid coords.
     #[error("invalid coord ({coord:?}) for size ({size:?})")]
     InvalidCoord { coord: Coord, size: Size },
+    /// Error to reprense invalid indexes.
+    #[error("invalid index {index} for lenght {lenght}")]
+    InvalidIndex { index: usize, lenght: usize },
     #[error("IO operation error")]
+    /// Error to wrap `io::Error`s.
     Io(#[from] io::Error),
+    /// Error ro wrap `FromUft8Error`s.
     #[error("UFT8 conversion error")]
     FromUtf8(#[from] FromUtf8Error),
 }
 
 impl Error {
-    /// Creates a `InvalidIndex` error.
-    pub fn new_invalid_index(index: usize, lenght: usize) -> Self {
-        Self::InvalidIndex { index, lenght }
+    /// Creates a `InvalidChunkType` error.
+    pub fn new_invalid_chunk_type(value: u8) -> Self {
+        Self::InvalidChunkType(value)
     }
 
     /// Creates a `InvalidCoord` error.
     pub fn new_invalid_coord(coord: Coord, size: Size) -> Self {
         Self::InvalidCoord { coord, size }
+    }
+
+    /// Creates a `InvalidIndex` error.
+    pub fn new_invalid_index(index: usize, lenght: usize) -> Self {
+        Self::InvalidIndex { index, lenght }
     }
 }
 
