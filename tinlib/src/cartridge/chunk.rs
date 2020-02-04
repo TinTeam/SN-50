@@ -13,15 +13,15 @@ pub enum ChunkType {
     /// The End of all chunk data.
     End = 0,
     /// Cover data.
-    Cover,
+    Cover = 1,
     /// Code data.
-    Code,
+    Code = 2,
     /// Dont data.
-    Font,
+    Font = 3,
     /// Palette data.
-    Palette,
+    Palette = 4,
     /// Map data.
-    Map,
+    Map = 5,
 }
 
 impl TryFrom<u8> for ChunkType {
@@ -50,6 +50,14 @@ pub struct ChunkHeader {
 }
 
 impl ChunkHeader {
+    /// Creates a ChunkHeader with the type and data provided.
+    pub fn new(chunk_type: ChunkType, size: usize) -> Self {
+        Self {
+            chunk_type,
+            size: size as u32,
+        }
+    }
+
     /// Creates a ChunkHeader from the data read from a Reader.
     pub fn from_reader<R: Read>(reader: &mut R) -> Result<ChunkHeader> {
         let chunk_type = reader.read_u8()?;
@@ -86,6 +94,16 @@ pub struct Chunk {
 }
 
 impl Chunk {
+    /// Creates a Chunk with the type and data provided.
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
+        let header = ChunkHeader::new(chunk_type, data.len());
+
+        Self {
+            header,
+            data: data.clone(),
+        }
+    }
+
     /// Creates a Chunk from the data read from a Reader.
     pub fn from_reader<R: Read>(reader: &mut R) -> Result<Chunk> {
         let header = ChunkHeader::from_reader(reader)?;
@@ -109,25 +127,7 @@ impl Chunk {
         Ok(())
     }
 
-    pub fn data_to_vec_u16(&self) -> Vec<u16> {
-        self.data
-            .chunks(2)
-            .map(|c| u16::from_le_bytes([c[0], c[1]]))
-            .collect()
-    }
-
-    pub fn data_to_vec_bool(&self) -> Vec<bool> {
-        self.data
-            .iter()
-            .map(|c| {
-                (0..8)
-                    .rev()
-                    .map(|i| c & (1 << i) != 0)
-                    .collect::<Vec<bool>>()
-            })
-            .flatten()
-            .collect()
-    }
+    // TODO Add validation methods
 }
 
 impl Default for Chunk {
@@ -336,34 +336,6 @@ mod test {
         let result = chunk.save(&mut writer);
         assert!(result.is_err());
         assert_matches!(result.unwrap_err(), Error::Io(_));
-    }
-
-    #[test]
-    fn test_chunk_data_to_vec_u16() {
-        let mut chunk = Chunk::default();
-        chunk.data = vec![0, 0, 0, 255, 255, 0, 255, 255];
-        //chunk.data = vec![0, 1, 15, 128, 240, 255];
-
-        let expected: Vec<u16> = vec![0, 65280, 255, 65535];
-        let result = chunk.data_to_vec_u16();
-        assert_eq!(result, expected);
-    }
-
-    #[test]
-    fn test_chunk_data_to_vec_bool() {
-        let mut chunk = Chunk::default();
-        chunk.data = vec![0, 1, 15, 128, 240, 255];
-
-        let expected: Vec<bool> = vec![
-            false, false, false, false, false, false, false, false, // 0
-            false, false, false, false, false, false, false, true, // 1
-            false, false, false, false, true, true, true, true, // 15
-            true, false, false, false, false, false, false, false, // 128
-            true, true, true, true, false, false, false, false, // 240
-            true, true, true, true, true, true, true, true, // 255
-        ];
-        let result = chunk.data_to_vec_bool();
-        assert_eq!(result, expected);
     }
 
     #[test]
