@@ -41,7 +41,7 @@ impl TryFrom<u8> for ChunkType {
 }
 
 /// The chunk header.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ChunkHeader {
     /// The chunk type value.
     pub chunk_type: ChunkType,
@@ -100,7 +100,7 @@ impl Chunk {
 
         Self {
             header,
-            data: data.clone(),
+            data,
         }
     }
 

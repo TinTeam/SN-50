@@ -20,7 +20,7 @@ const DEFAULT_AUTHOR_SIZE: u8 = 64;
 const DEFAULT_VERSION: u8 = 1;
 
 /// The cartridge header.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CartridgeHeader {
     pub cart_version: u8,
     pub name_size: u8,
