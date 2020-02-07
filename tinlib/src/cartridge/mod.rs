@@ -401,6 +401,17 @@ mod test_super {
     }
 
     #[test]
+    fn test_cartridge_save_error() {
+        let cart = Cartridge::default();
+
+        let mut buff = [0u8; 1];
+        let mut writer = Cursor::new(&mut buff[0..]);
+        let result = cart.save(&mut writer);
+        assert!(result.is_err());
+        assert_matches!(result.unwrap_err(), Error::Io(_));
+    }
+
+    #[test]
     fn test_cartridge_default() {
         let cart = Cartridge::default();
         assert_eq!(cart.version, DEFAULT_VERSION);

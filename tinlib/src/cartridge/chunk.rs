@@ -98,10 +98,7 @@ impl Chunk {
     pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
         let header = ChunkHeader::new(chunk_type, data.len());
 
-        Self {
-            header,
-            data,
-        }
+        Self { header, data }
     }
 
     /// Creates a Chunk from the data read from a Reader.
