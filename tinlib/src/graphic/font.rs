@@ -2,7 +2,7 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Error, Result};
+use crate::common::{CommonError, Result};
 use crate::graphic::glyph::Glyph;
 
 /// Number of Glyphs in a Font.
@@ -29,7 +29,7 @@ impl Font {
     /// Returns a glyph.
     pub fn get_glyph(&self, index: usize) -> Result<Glyph> {
         if !self.is_index_valid(index) {
-            return Err(Error::new_invalid_index(index, self.lenght()));
+            return Err(CommonError::new_invalid_index(index, self.lenght()));
         }
 
         Ok(self.glyphs[index])
@@ -38,7 +38,7 @@ impl Font {
     /// Sets a glyph.
     pub fn set_glyph(&mut self, index: usize, glyph: Glyph) -> Result<()> {
         if !self.is_index_valid(index) {
-            return Err(Error::new_invalid_index(index, self.lenght()));
+            return Err(CommonError::new_invalid_index(index, self.lenght()));
         }
 
         self.glyphs[index] = glyph;
@@ -118,7 +118,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidIndex { index: i, lenght: l } if i == index && l == font.lenght()
+            CommonError::InvalidIndex { index: i, lenght: l } if i == index && l == font.lenght()
         );
     }
 
@@ -148,7 +148,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidIndex { index: i, lenght: l } if i == index && l == font.lenght()
+            CommonError::InvalidIndex { index: i, lenght: l } if i == index && l == font.lenght()
         );
     }
 

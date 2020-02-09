@@ -2,7 +2,7 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Error, Result};
+use crate::common::{CommonError, Result};
 use crate::graphic::color::Color;
 
 /// Number of colors in a Palette.
@@ -29,7 +29,7 @@ impl Palette {
     /// Returns a color.
     pub fn get_color(&self, index: usize) -> Result<Color> {
         if !self.is_index_valid(index) {
-            return Err(Error::new_invalid_index(index, self.lenght()));
+            return Err(CommonError::new_invalid_index(index, self.lenght()));
         }
 
         Ok(self.colors[index])
@@ -38,7 +38,7 @@ impl Palette {
     /// Sets a color.
     pub fn set_color(&mut self, index: usize, color: Color) -> Result<()> {
         if !self.is_index_valid(index) {
-            return Err(Error::new_invalid_index(index, self.lenght()));
+            return Err(CommonError::new_invalid_index(index, self.lenght()));
         }
 
         self.colors[index] = color;
@@ -115,7 +115,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidIndex { index: i, lenght: l } if i == index && l == palette.lenght()
+            CommonError::InvalidIndex { index: i, lenght: l } if i == index && l == palette.lenght()
         );
     }
 
@@ -142,7 +142,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidIndex { index: i, lenght: l } if i == index && l == palette.lenght()
+            CommonError::InvalidIndex { index: i, lenght: l } if i == index && l == palette.lenght()
         );
     }
 

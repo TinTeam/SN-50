@@ -2,7 +2,9 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Error, Result, Size};
+use crate::common::{
+    CommonError, Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Result, Size,
+};
 use crate::graphic::Color;
 
 /// Screen width in pixels.
@@ -45,7 +47,7 @@ impl Screen {
     /// Returns a pixel.
     pub fn get_pixel(&self, coord: Coord) -> Result<ScreenPixel> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -55,7 +57,7 @@ impl Screen {
     /// Sets a pixels.
     pub fn set_pixel(&mut self, coord: Coord, pixel: ScreenPixel) -> Result<()> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -166,7 +168,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
         );
     }
 
@@ -195,7 +197,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
         );
     }
 

@@ -1,12 +1,14 @@
 //! Cartridge utilities.
 mod chunk;
+mod error;
+
+pub use crate::cartridge::error::{CartridgeError, Result};
 
 use std::io::{Read, Write};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use crate::cartridge::chunk::{Chunk, ChunkType};
-use crate::common::Result;
 
 /// The default cartridge file version.
 const DEFAULT_CART_FILE_VERSION: u8 = 1;
@@ -21,14 +23,12 @@ const DEFAULT_VERSION: u8 = 1;
 
 /// The cartridge header.
 #[derive(Debug, Clone, PartialEq)]
-pub struct CartridgeHeader {
+struct CartridgeHeader {
     pub cart_version: u8,
     pub name_size: u8,
     pub desc_size: u16,
     pub author_size: u8,
 }
-
-// TODO save and destroy things
 
 impl CartridgeHeader {
     /// Creates a CartridgeHeader from the data read from a Reader.
@@ -104,24 +104,24 @@ impl Cartridge {
         loop {
             let chunk = Chunk::from_reader(reader)?;
 
-            match chunk.header.chunk_type {
+            match chunk.chunk_type() {
                 ChunkType::End => {
                     break;
                 }
                 ChunkType::Cover => {
-                    cart.cover = chunk.data;
+                    cart.cover = chunk.data().clone();
                 }
                 ChunkType::Code => {
-                    cart.code = String::from_utf8(chunk.data)?;
+                    cart.code = String::from_utf8(chunk.data().clone())?;
                 }
                 ChunkType::Font => {
-                    cart.font = chunk.data;
+                    cart.font = chunk.data().clone();
                 }
                 ChunkType::Palette => {
-                    cart.palette = chunk.data;
+                    cart.palette = chunk.data().clone();
                 }
                 ChunkType::Map => {
-                    cart.map = chunk.data;
+                    cart.map = chunk.data().clone();
                 }
             }
         }
@@ -183,8 +183,6 @@ mod test_super {
 
     use assert_matches::assert_matches;
 
-    use crate::common::Error;
-
     use super::*;
 
     #[test]
@@ -208,7 +206,7 @@ mod test_super {
 
         let result = CartridgeHeader::from_reader(&mut reader);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
@@ -240,7 +238,7 @@ mod test_super {
         let mut writer = Cursor::new(&mut buff[0..]);
         let result = header.save(&mut writer);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
@@ -345,7 +343,7 @@ mod test_super {
 
         let result = Cartridge::from_reader(&mut reader);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
@@ -360,7 +358,7 @@ mod test_super {
 
         let result = Cartridge::from_reader(&mut reader);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
@@ -408,7 +406,7 @@ mod test_super {
         let mut writer = Cursor::new(&mut buff[0..]);
         let result = cart.save(&mut writer);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]

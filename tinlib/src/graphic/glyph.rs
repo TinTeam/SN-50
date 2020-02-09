@@ -2,7 +2,9 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Error, Result, Size};
+use crate::common::{
+    CommonError, Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Result, Size,
+};
 
 /// The Glyph width.
 pub const GLYPH_WIDTH: usize = 8;
@@ -52,7 +54,7 @@ impl Glyph {
     /// Returns a pixel.
     pub fn get_pixel(&self, coord: Coord) -> Result<GlyphPixel> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -62,7 +64,7 @@ impl Glyph {
     /// Sets a pixel.
     pub fn set_pixel(&mut self, coord: Coord, value: GlyphPixel) -> Result<()> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -172,7 +174,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
         );
     }
 
@@ -199,7 +201,7 @@ mod tests {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
         );
     }
 

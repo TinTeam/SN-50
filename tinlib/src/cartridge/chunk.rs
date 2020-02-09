@@ -5,7 +5,15 @@ use std::result::Result as StdResult;
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
-use crate::common::{Error, Result};
+use crate::cartridge::error::{CartridgeError, Result};
+
+// Valid chunk sizes.
+const END_CHUNK_VALID_SIZE: [usize; 1] = [0];
+const COVER_CHUNK_VALID_SIZES: [usize; 2] = [0, 245760];
+const FONT_CHUNK_VALID_SIZES: [usize; 2] = [0, 16384];
+const PALETTE_CHUNK_VALID_SIZES: [usize; 4] = [0, 4, 8, 16];
+const CODE_CHUNK_MAX_SIZE: usize = 131072;
+const MAP_CHUNK_MAX_SIZE: usize = 122880;
 
 /// The Chunk type.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -25,7 +33,7 @@ pub enum ChunkType {
 }
 
 impl TryFrom<u8> for ChunkType {
-    type Error = Error;
+    type Error = CartridgeError;
 
     fn try_from(value: u8) -> StdResult<Self, Self::Error> {
         match value {
@@ -35,7 +43,7 @@ impl TryFrom<u8> for ChunkType {
             3 => Ok(ChunkType::Font),
             4 => Ok(ChunkType::Palette),
             5 => Ok(ChunkType::Map),
-            _ => Err(Error::new_invalid_chunk_type(value)),
+            _ => Err(CartridgeError::new_invalid_chunk_type(value)),
         }
     }
 }
@@ -44,9 +52,9 @@ impl TryFrom<u8> for ChunkType {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ChunkHeader {
     /// The chunk type value.
-    pub chunk_type: ChunkType,
+    chunk_type: ChunkType,
     /// The chunk size.
-    pub size: u32,
+    size: u32,
 }
 
 impl ChunkHeader {
@@ -89,8 +97,8 @@ impl Default for ChunkHeader {
 /// The data chunk.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Chunk {
-    pub header: ChunkHeader,
-    pub data: Vec<u8>,
+    header: ChunkHeader,
+    data: Vec<u8>,
 }
 
 impl Chunk {
@@ -99,6 +107,14 @@ impl Chunk {
         let header = ChunkHeader::new(chunk_type, data.len());
 
         Self { header, data }
+    }
+
+    pub fn chunk_type(&self) -> ChunkType {
+        self.header.chunk_type
+    }
+
+    pub fn data(&self) -> &Vec<u8> {
+        &self.data
     }
 
     /// Creates a Chunk from the data read from a Reader.
@@ -110,11 +126,16 @@ impl Chunk {
             data.push(reader.read_u8()?);
         }
 
-        Ok(Chunk { header, data })
+        let chunk = Chunk { header, data };
+        chunk.validate()?;
+
+        Ok(chunk)
     }
 
     // Saves the Chunk data into a Writer.
     pub fn save<W: Write>(&self, writer: &mut W) -> Result<()> {
+        self.validate()?;
+
         self.header.save(writer)?;
 
         for data in self.data.iter() {
@@ -124,7 +145,96 @@ impl Chunk {
         Ok(())
     }
 
-    // TODO Add validation methods
+    fn validate(&self) -> Result<()> {
+        if self.header.size != self.data.len() as u32 {
+            return Err(CartridgeError::new_mismatched_chunk_sizes(
+                self.header.chunk_type,
+                self.header.size as usize,
+                self.data.len(),
+            ));
+        }
+
+        match self.chunk_type() {
+            ChunkType::End => self.validate_end(),
+            ChunkType::Cover => self.validate_cover(),
+            ChunkType::Code => self.validate_code(),
+            ChunkType::Font => self.validate_font(),
+            ChunkType::Palette => self.validate_palette(),
+            ChunkType::Map => self.validate_map(),
+        }
+    }
+
+    fn validate_end(&self) -> Result<()> {
+        if END_CHUNK_VALID_SIZE.contains(&self.data.len()) {
+            return Err(CartridgeError::new_invalid_chunk_size(
+                self.header.chunk_type,
+                self.data.len(),
+                END_CHUNK_VALID_SIZE.to_vec(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn validate_cover(&self) -> Result<()> {
+        if COVER_CHUNK_VALID_SIZES.contains(&self.data.len()) {
+            return Err(CartridgeError::new_invalid_chunk_size(
+                self.header.chunk_type,
+                self.data.len(),
+                COVER_CHUNK_VALID_SIZES.to_vec(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn validate_code(&self) -> Result<()> {
+        if self.data.len() <= CODE_CHUNK_MAX_SIZE {
+            return Err(CartridgeError::new_invalid_chunk_max_size(
+                self.header.chunk_type,
+                self.data.len(),
+                CODE_CHUNK_MAX_SIZE,
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn validate_font(&self) -> Result<()> {
+        if FONT_CHUNK_VALID_SIZES.contains(&self.data.len()) {
+            return Err(CartridgeError::new_invalid_chunk_size(
+                self.header.chunk_type,
+                self.data.len(),
+                FONT_CHUNK_VALID_SIZES.to_vec(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn validate_palette(&self) -> Result<()> {
+        if PALETTE_CHUNK_VALID_SIZES.contains(&self.data.len()) {
+            return Err(CartridgeError::new_invalid_chunk_size(
+                self.header.chunk_type,
+                self.data.len(),
+                PALETTE_CHUNK_VALID_SIZES.to_vec(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn validate_map(&self) -> Result<()> {
+        if self.data.len() <= MAP_CHUNK_MAX_SIZE {
+            return Err(CartridgeError::new_invalid_chunk_max_size(
+                self.header.chunk_type,
+                self.data.len(),
+                MAP_CHUNK_MAX_SIZE,
+            ));
+        }
+
+        Ok(())
+    }
 }
 
 impl Default for Chunk {
@@ -171,7 +281,7 @@ mod test {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidChunkType(v) if v == value
+            CartridgeError::InvalidChunkType(v) if v == value
         );
     }
 
@@ -196,7 +306,7 @@ mod test {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidChunkType(v) if v == 6
+            CartridgeError::InvalidChunkType(v) if v == 6
         );
     }
 
@@ -206,7 +316,7 @@ mod test {
 
         let result = ChunkHeader::from_reader(&mut reader);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
@@ -234,7 +344,7 @@ mod test {
         let mut writer = Cursor::new(&mut buff[0..]);
         let result = chunk_header.save(&mut writer);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
@@ -280,7 +390,7 @@ mod test {
         assert!(result.is_err());
         assert_matches!(
             result.unwrap_err(),
-            Error::InvalidChunkType(v) if v == 6
+            CartridgeError::InvalidChunkType(v) if v == 6
         );
     }
 
@@ -296,7 +406,7 @@ mod test {
 
         let result = Chunk::from_reader(&mut reader);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
@@ -332,7 +442,7 @@ mod test {
         let mut writer = Cursor::new(&mut buff[0..]);
         let result = chunk.save(&mut writer);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), Error::Io(_));
+        assert_matches!(result.unwrap_err(), CartridgeError::Io(_));
     }
 
     #[test]
