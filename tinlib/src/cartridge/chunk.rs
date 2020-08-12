@@ -8,10 +8,11 @@ use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::cartridge::error::{CartridgeError, Result};
 
 // Valid chunk sizes.
+// TODO Use machine constants to give meaning to these guys.
 const END_CHUNK_VALID_SIZE: [usize; 1] = [0];
 const COVER_CHUNK_VALID_SIZES: [usize; 2] = [0, 245760];
 const FONT_CHUNK_VALID_SIZES: [usize; 2] = [0, 16384];
-const PALETTE_CHUNK_VALID_SIZES: [usize; 4] = [0, 4, 8, 16];
+const PALETTE_CHUNK_VALID_SIZES: [usize; 4] = [0, 12, 24, 48];
 const CODE_CHUNK_MAX_SIZE: usize = 131072;
 const MAP_CHUNK_MAX_SIZE: usize = 122880;
 
@@ -165,7 +166,7 @@ impl Chunk {
     }
 
     fn validate_end(&self) -> Result<()> {
-        if END_CHUNK_VALID_SIZE.contains(&self.data.len()) {
+        if !END_CHUNK_VALID_SIZE.contains(&self.data.len()) {
             return Err(CartridgeError::new_invalid_chunk_size(
                 self.header.chunk_type,
                 self.data.len(),
@@ -177,7 +178,7 @@ impl Chunk {
     }
 
     fn validate_cover(&self) -> Result<()> {
-        if COVER_CHUNK_VALID_SIZES.contains(&self.data.len()) {
+        if !COVER_CHUNK_VALID_SIZES.contains(&self.data.len()) {
             return Err(CartridgeError::new_invalid_chunk_size(
                 self.header.chunk_type,
                 self.data.len(),
@@ -189,7 +190,7 @@ impl Chunk {
     }
 
     fn validate_code(&self) -> Result<()> {
-        if self.data.len() <= CODE_CHUNK_MAX_SIZE {
+        if self.data.len() > CODE_CHUNK_MAX_SIZE {
             return Err(CartridgeError::new_invalid_chunk_max_size(
                 self.header.chunk_type,
                 self.data.len(),
@@ -201,7 +202,7 @@ impl Chunk {
     }
 
     fn validate_font(&self) -> Result<()> {
-        if FONT_CHUNK_VALID_SIZES.contains(&self.data.len()) {
+        if !FONT_CHUNK_VALID_SIZES.contains(&self.data.len()) {
             return Err(CartridgeError::new_invalid_chunk_size(
                 self.header.chunk_type,
                 self.data.len(),
@@ -213,7 +214,7 @@ impl Chunk {
     }
 
     fn validate_palette(&self) -> Result<()> {
-        if PALETTE_CHUNK_VALID_SIZES.contains(&self.data.len()) {
+        if !PALETTE_CHUNK_VALID_SIZES.contains(&self.data.len()) {
             return Err(CartridgeError::new_invalid_chunk_size(
                 self.header.chunk_type,
                 self.data.len(),
@@ -225,7 +226,7 @@ impl Chunk {
     }
 
     fn validate_map(&self) -> Result<()> {
-        if self.data.len() <= MAP_CHUNK_MAX_SIZE {
+        if self.data.len() > MAP_CHUNK_MAX_SIZE {
             return Err(CartridgeError::new_invalid_chunk_max_size(
                 self.header.chunk_type,
                 self.data.len(),
@@ -372,6 +373,7 @@ mod test {
         };
 
         let result = Chunk::from_reader(&mut reader);
+        println!("{:?}", result);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), expected);
     }
