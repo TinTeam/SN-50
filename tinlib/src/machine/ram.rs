@@ -4,6 +4,7 @@ use crate::machine::input::Input;
 use crate::map::Map;
 
 /// The machine RAM representation.
+#[derive(Default)]
 pub struct RAM<'map> {
     code: Code,
     map: Map<'map>,
@@ -39,16 +40,5 @@ impl<'map> RAM<'map> {
     /// Returns a mutable input reference.
     pub fn input_mut(&mut self) -> &mut Input {
         &mut self.input
-    }
-}
-
-impl<'map> Default for RAM<'map> {
-    // Creates a new RAM.
-    fn default() -> Self {
-        Self {
-            code: Code::default(),
-            map: Map::default(),
-            input: Input::default(),
-        }
     }
 }

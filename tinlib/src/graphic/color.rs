@@ -1,7 +1,7 @@
 //! Color implementation and manipulation.
 
 /// A color representation with red, green and blue values.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Color {
     red: u8,
     green: u8,
@@ -37,16 +37,6 @@ impl Color {
     /// Get blue value.
     pub fn blue(self) -> u8 {
         self.blue
-    }
-}
-
-impl Default for Color {
-    fn default() -> Self {
-        Self {
-            red: 0,
-            green: 0,
-            blue: 0,
-        }
     }
 }
 
@@ -91,15 +81,6 @@ mod tests {
         assert_eq!(color.red(), 1);
         assert_eq!(color.green(), 2);
         assert_eq!(color.blue(), 3);
-    }
-
-    #[test]
-    fn test_color_default() {
-        let color = Color::default();
-
-        assert_eq!(color.red, 0);
-        assert_eq!(color.green, 0);
-        assert_eq!(color.blue, 0);
     }
 
     #[test]
