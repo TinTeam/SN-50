@@ -10,7 +10,7 @@ keywords = ["sn-50", "fantasy", "console", "computer"]
 categories = ["games", "game-development", "game-engines"]
 license = "MIT"
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 tinlib = { version = "0.1.0", path = "../tinlib" }
