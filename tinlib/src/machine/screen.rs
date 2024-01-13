@@ -180,7 +180,6 @@ mod tests {
 
         let result = screen.set_pixel(coord, pixel);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = screen.get_pixel(coord);
         assert!(result.is_ok());

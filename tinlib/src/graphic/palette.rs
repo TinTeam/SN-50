@@ -126,7 +126,6 @@ mod tests {
 
         let result = palette.set_color(0, color);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = palette.get_color(0);
         assert_eq!(result.unwrap(), color);

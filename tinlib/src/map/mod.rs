@@ -221,7 +221,6 @@ mod tests {
 
         let result = map.set_tile(coord, tile);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = map.get_tile(coord);
         assert!(result.is_ok());

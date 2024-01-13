@@ -132,7 +132,6 @@ mod tests {
 
         let result = font.set_glyph(0, new_glyph);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = font.get_glyph(0);
         assert_eq!(result.unwrap(), new_glyph);

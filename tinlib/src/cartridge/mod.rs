@@ -130,10 +130,12 @@ impl Cartridge {
     }
 
     pub fn save<W: Write>(&self, writer: &mut W) -> Result<()> {
-        let mut header = CartridgeHeader::default();
-        header.name_size = self.name.len() as u8;
-        header.desc_size = self.desc.len() as u16;
-        header.author_size = self.author.len() as u8;
+        let header = CartridgeHeader {
+            name_size: self.name.len() as u8,
+            desc_size: self.desc.len() as u16,
+            author_size: self.author.len() as u8,
+            ..Default::default()
+        };
         header.save(writer)?;
 
         writer.write_u8(self.version)?;

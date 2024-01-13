@@ -3,20 +3,21 @@ use std::io::Cursor;
 use tinlib::cartridge::Cartridge;
 
 fn main() {
-    let mut cart = Cartridge::default();
-
-    // An incomplete game cart with empty fonts, map and cover.
-    cart.version = 17;
-    cart.name = "Dungeons of the Dungeon".to_string();
-    cart.desc = "A cool game about dungeons inside dungeons.".to_string();
-    cart.author = "Luiz de Prá".to_string();
-    cart.palette = vec![
-        0x2d, 0x1b, 0x000, // dark
-        0x1e, 0x60, 0x6e, // dark greenish
-        0x5a, 0xb9, 0xa8, // greenish
-        0xc4, 0xf0, 0xc2, // light greenish
-    ];
-    cart.code = "def main:\n    pass".to_string();
+    let cart = Cartridge {
+        // An incomplete game cart with empty fonts, map and cover.
+        version: 17,
+        name: "Dungeons of the Dungeon".to_string(),
+        desc: "A cool game about dungeons inside dungeons.".to_string(),
+        author: "Luiz de Prá".to_string(),
+        palette: vec![
+            0x2d, 0x1b, 0x000, // dark
+            0x1e, 0x60, 0x6e, // dark greenish
+            0x5a, 0xb9, 0xa8, // greenish
+            0xc4, 0xf0, 0xc2, // light greenish
+        ],
+        code: "def main:\n    pass".to_string(),
+        ..Default::default()
+    };
 
     println!("Pre-save Cart: {:?}\n\n", &cart);
 

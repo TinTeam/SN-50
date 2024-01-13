@@ -185,7 +185,6 @@ mod tests {
 
         let result = glyph.set_pixel(coord, GlyphPixel::Solid);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = glyph.get_pixel(coord);
         assert!(result.is_ok());
