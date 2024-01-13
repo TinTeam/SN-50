@@ -1,18 +1,33 @@
-fail_fast: true
-
 repos:
-  - repo: local
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
     hooks:
-      - id: fmt
-        name: fmt
-        language: system
-        files: '[.]rs$'
-        entry: cargo fmt
-        pass_filenames: false
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-shebang-scripts-are-executable
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: forbid-submodules
+      - id: mixed-line-ending
+      - id: mixed-line-ending
+      - id: no-commit-to-branch
+      - id: trailing-whitespace
 
-      - id: clippy
-        name: clippy
-        language: system
-        files: '[.]rs$'
-        entry: cargo clippy
-        pass_filenames: false
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.1.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+    - id: fmt
+    - id: cargo-check
+      args: ['--all-targets', '--locked']
+    - id: clippy
+      args: ['--all-targets', '--all-features', '--locked', '--', '-D', 'warnings']
