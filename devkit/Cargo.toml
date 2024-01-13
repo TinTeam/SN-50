@@ -11,6 +11,7 @@ categories = ["games", "game-development", "game-engines"]
 license = "MIT"
 readme = "README.md"
 edition = "2021"
+rust-version = "1.60.0"
 
 [dependencies]
 tinlib = { version = "0.1.0", path = "../tinlib" }
