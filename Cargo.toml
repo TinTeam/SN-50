@@ -1,5 +1,3 @@
 [workspace]
-members = [
-    "tinlib",
-    "devkit"
-]
+members = ["tinlib", "devkit"]
+resolver = "2"

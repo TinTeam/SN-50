@@ -2,7 +2,9 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Error, Result, Size};
+use crate::common::{
+    CommonError, Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Result, Size,
+};
 use crate::graphic::Color;
 
 /// Screen width in pixels.
@@ -45,7 +47,7 @@ impl Screen {
     /// Returns a pixel.
     pub fn get_pixel(&self, coord: Coord) -> Result<ScreenPixel> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -55,7 +57,7 @@ impl Screen {
     /// Sets a pixels.
     pub fn set_pixel(&mut self, coord: Coord, pixel: ScreenPixel) -> Result<()> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -124,6 +126,8 @@ impl fmt::Debug for Screen {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -160,10 +164,12 @@ mod tests {
         let screen = Screen::default();
         let coord = Coord::new(641, 1);
 
-        let error = Error::new_invalid_coord(coord, screen.size());
         let result = screen.get_pixel(coord);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
+        );
     }
 
     #[test]
@@ -174,7 +180,6 @@ mod tests {
 
         let result = screen.set_pixel(coord, pixel);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = screen.get_pixel(coord);
         assert!(result.is_ok());
@@ -187,10 +192,12 @@ mod tests {
         let coord = Coord::new(641, 1);
         let pixel = ScreenPixel::new(255, 255, 255);
 
-        let error = Error::new_invalid_coord(coord, screen.size());
         let result = screen.set_pixel(coord, pixel);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == screen.size()
+        );
     }
 
     #[test]

@@ -2,7 +2,7 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Error, Result};
+use crate::common::{CommonError, Result};
 use crate::graphic::color::Color;
 
 /// Number of colors in a Palette.
@@ -29,7 +29,7 @@ impl Palette {
     /// Returns a color.
     pub fn get_color(&self, index: usize) -> Result<Color> {
         if !self.is_index_valid(index) {
-            return Err(Error::new_invalid_index(index, self.lenght()));
+            return Err(CommonError::new_invalid_index(index, self.lenght()));
         }
 
         Ok(self.colors[index])
@@ -38,7 +38,7 @@ impl Palette {
     /// Sets a color.
     pub fn set_color(&mut self, index: usize, color: Color) -> Result<()> {
         if !self.is_index_valid(index) {
-            return Err(Error::new_invalid_index(index, self.lenght()));
+            return Err(CommonError::new_invalid_index(index, self.lenght()));
         }
 
         self.colors[index] = color;
@@ -80,6 +80,8 @@ impl fmt::Debug for Palette {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -101,17 +103,20 @@ mod tests {
 
         let result = palette.get_color(0);
         assert!(result.is_ok());
-        assert_eq!(result, Ok(color));
+        assert_eq!(result.unwrap(), color);
     }
 
     #[test]
     fn test_palette_get_color_invalid_index() {
         let palette = Palette::default();
-        let error = Error::new_invalid_index(16, palette.lenght());
+        let index = 16usize;
 
-        let result = palette.get_color(16);
+        let result = palette.get_color(index);
         assert!(result.is_err());
-        assert_eq!(result, Err(error));
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidIndex { index: i, lenght: l } if i == index && l == palette.lenght()
+        );
     }
 
     #[test]
@@ -121,21 +126,23 @@ mod tests {
 
         let result = palette.set_color(0, color);
         assert!(result.is_ok());
-        assert_eq!(result, Ok(()));
 
         let result = palette.get_color(0);
-        assert_eq!(result, Ok(color));
+        assert_eq!(result.unwrap(), color);
     }
 
     #[test]
     fn test_palette_set_color_invalid_index() {
         let mut palette = Palette::default();
         let color = Color::new(255, 255, 255);
-        let error = Error::new_invalid_index(16, palette.lenght());
+        let index = 16usize;
 
         let result = palette.set_color(16, color);
         assert!(result.is_err());
-        assert_eq!(result, Err(error));
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidIndex { index: i, lenght: l } if i == index && l == palette.lenght()
+        );
     }
 
     #[test]

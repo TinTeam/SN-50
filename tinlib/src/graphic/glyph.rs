@@ -2,7 +2,9 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Error, Result, Size};
+use crate::common::{
+    CommonError, Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Result, Size,
+};
 
 /// The Glyph width.
 pub const GLYPH_WIDTH: usize = 8;
@@ -52,7 +54,7 @@ impl Glyph {
     /// Returns a pixel.
     pub fn get_pixel(&self, coord: Coord) -> Result<GlyphPixel> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -62,7 +64,7 @@ impl Glyph {
     /// Sets a pixel.
     pub fn set_pixel(&mut self, coord: Coord, value: GlyphPixel) -> Result<()> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -130,6 +132,8 @@ impl fmt::Debug for Glyph {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -166,10 +170,12 @@ mod tests {
         let coord = Coord::new(9, 1);
         let glyph = Glyph::default();
 
-        let error = Error::new_invalid_coord(coord, glyph.size());
         let result = glyph.get_pixel(coord);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
+        );
     }
 
     #[test]
@@ -179,7 +185,6 @@ mod tests {
 
         let result = glyph.set_pixel(coord, GlyphPixel::Solid);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = glyph.get_pixel(coord);
         assert!(result.is_ok());
@@ -191,10 +196,12 @@ mod tests {
         let coord = Coord::new(9, 1);
         let mut glyph = Glyph::default();
 
-        let error = Error::new_invalid_coord(coord, glyph.size());
         let result = glyph.set_pixel(coord, GlyphPixel::Solid);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == glyph.size()
+        );
     }
 
     #[test]

@@ -2,7 +2,9 @@
 use std::fmt;
 use std::slice;
 
-use crate::common::{Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Error, Result, Size};
+use crate::common::{
+    CommonError, Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Result, Size,
+};
 use crate::graphic::{Color, Glyph};
 
 /// Map width in Glyphs.
@@ -69,7 +71,7 @@ impl<'tile> Map<'tile> {
     /// Returns a tile.
     pub fn get_tile(&self, coord: Coord) -> Result<Option<Tile<'tile>>> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -79,7 +81,7 @@ impl<'tile> Map<'tile> {
     /// Sets a tile.
     pub fn set_tile(&mut self, coord: Coord, value: Tile<'tile>) -> Result<()> {
         if !self.is_coord_valid(coord) {
-            return Err(Error::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size()));
         }
 
         let index = self.get_index(coord);
@@ -141,6 +143,8 @@ impl<'tile> fmt::Debug for Map<'tile> {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -198,10 +202,12 @@ mod tests {
         let coord = Coord::new(321, 1);
         let map = Map::default();
 
-        let error = Error::new_invalid_coord(coord, map.size());
         let result = map.get_tile(coord);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == map.size()
+        );
     }
 
     #[test]
@@ -215,7 +221,6 @@ mod tests {
 
         let result = map.set_tile(coord, tile);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ());
 
         let result = map.get_tile(coord);
         assert!(result.is_ok());
@@ -233,10 +238,12 @@ mod tests {
         let mut map = Map::default();
         let tile = Tile::new(&glyph, &color);
 
-        let error = Error::new_invalid_coord(coord, map.size());
         let result = map.set_tile(coord, tile);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), error);
+        assert_matches!(
+            result.unwrap_err(),
+            CommonError::InvalidCoord { coord: c, size: s } if c == coord && s == map.size()
+        );
     }
 
     #[test]
