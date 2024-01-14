@@ -145,10 +145,10 @@ impl Cartridge {
 
         let chunks = vec![
             (self.cover.clone(), ChunkType::Cover),
+            (self.code.as_bytes().to_vec(), ChunkType::Code),
             (self.font.clone(), ChunkType::Font),
             (self.palette.clone(), ChunkType::Palette),
             (self.map.clone(), ChunkType::Map),
-            (self.code.as_bytes().to_vec(), ChunkType::Code),
         ];
 
         for (data, chunk_type) in chunks.into_iter().filter(|(d, _)| !d.is_empty()) {
@@ -254,45 +254,66 @@ mod test_super {
 
     #[test]
     fn test_cartridge_from_reader() {
-        let mut reader = Cursor::new(vec![
-            // header
+        let mut data = vec![
+            // cart header
             1,  // cart version
             10, // name size
             11, 0, // desc size
             2, // author size
-            // cart
-            11, // version
+        ];
+
+        // cart data
+        data.extend_from_slice(&[
+            11, // cart version
             116, 104, 105, 115, 105, 115, 110, 97, 109, 101, // name
             100, 101, 115, 99, 114, 105, 195, 167, 195, 163, 111, // desc
             109, 101, // author
-            // code
+        ]);
+
+        // code chunk
+        data.extend_from_slice(&[
             2, 6, 0, 0, 0, // header
             109, 97, 105, 110, 40, 41, // data
-            // map
-            5, 4, 0, 0, 0, // header
-            0, 1, 2, 3, // data
-            // font
-            3, 2, 0, 0, 0, // header
-            1, 2, // data
-            // cover
-            1, 4, 0, 0, 0, // header
-            1, 2, 3, 4, // data
-            // palette
-            4, 3, 0, 0, 0, // header
-            0, 0, 0, // data
-            // end
-            0, 0, 0, 0, 0, // ignored
-            1, 0, 0, 0, 0,
         ]);
+
+        // map chunk
+        data.extend_from_slice(&[
+            5, 0, 0, 0, 0, // header
+        ]);
+
+        // font chunk
+        data.extend_from_slice(&[
+            3, 0, 64, 0, 0, // header
+        ]);
+        data.extend_from_slice(&[0; 16384]);
+
+        // cover chunk
+        data.extend_from_slice(&[
+            1, 0, 0, 0, 0, // header
+        ]);
+
+        // palette chunk
+        data.extend_from_slice(&[
+            4, 12, 0, 0, 0, // header
+            0, 0, 0, 255, 255, 255, 180, 180, 180, 90, 90, 90, // data
+        ]);
+
+        // end chunk
+        data.extend_from_slice(&[
+            0, 0, 0, 0, 0, // ignored
+            1, 0, 0, 0, 0, // junk data
+        ]);
+
+        let mut reader = Cursor::new(data);
         let expected = Cartridge {
             version: 11,
             name: "thisisname".to_string(),
             desc: "descrição".to_string(),
             author: "me".to_string(),
-            cover: vec![1, 2, 3, 4],
-            font: vec![1, 2],
-            palette: vec![0, 0, 0],
-            map: vec![0, 1, 2, 3],
+            cover: vec![],
+            font: vec![0; 16384],
+            palette: vec![0, 0, 0, 255, 255, 255, 180, 180, 180, 90, 90, 90],
+            map: vec![],
             code: "main()".to_string(),
         };
 
@@ -370,20 +391,53 @@ mod test_super {
             name: "thisisname".to_string(),
             desc: "descrição".to_string(),
             author: "me".to_string(),
-            cover: vec![1, 2, 3, 4],
-            font: vec![1, 2],
-            palette: vec![0, 0, 0],
-            map: vec![0, 1, 2, 3],
+            cover: vec![],
+            font: vec![0; 16384],
+            palette: vec![0, 0, 0, 255, 255, 255, 180, 180, 180, 90, 90, 90],
+            map: vec![],
             code: "main()".to_string(),
         };
-        let expected: Vec<u8> = vec![
-            1, 10, 11, 0, 2, 11, 116, 104, 105, 115, 105, 115, 110, 97, 109, 101, 100, 101, 115,
-            99, 114, 105, 195, 167, 195, 163, 111, 109, 101, 1, 4, 0, 0, 0, 1, 2, 3, 4, 3, 2, 0, 0,
-            0, 1, 2, 4, 3, 0, 0, 0, 0, 0, 0, 5, 4, 0, 0, 0, 0, 1, 2, 3, 2, 6, 0, 0, 0, 109, 97,
-            105, 110, 40, 41, 0, 0, 0, 0, 0,
+
+        let mut expected = vec![
+            // cart header
+            1,  // cart version
+            10, // name size
+            11, 0, // desc size
+            2, // author size
         ];
 
-        let mut writer = Cursor::new(vec![0u8; 5]);
+        // cart data
+        expected.extend_from_slice(&[
+            11, // cart version
+            116, 104, 105, 115, 105, 115, 110, 97, 109, 101, // name
+            100, 101, 115, 99, 114, 105, 195, 167, 195, 163, 111, // desc
+            109, 101, // author
+        ]);
+
+        // code chunk
+        expected.extend_from_slice(&[
+            2, 6, 0, 0, 0, // header
+            109, 97, 105, 110, 40, 41, // data
+        ]);
+
+        // font chunk
+        expected.extend_from_slice(&[
+            3, 0, 64, 0, 0, // header
+        ]);
+        expected.extend_from_slice(&[0; 16384]);
+
+        // palette chunk
+        expected.extend_from_slice(&[
+            4, 12, 0, 0, 0, // header
+            0, 0, 0, 255, 255, 255, 180, 180, 180, 90, 90, 90, // data
+        ]);
+
+        // end chunk
+        expected.extend_from_slice(&[
+            0, 0, 0, 0, 0, // ignored
+        ]);
+
+        let mut writer = Cursor::new(vec![0u8; expected.len()]);
         let result = cart.save(&mut writer);
         assert!(result.is_ok());
         assert_eq!(writer.get_ref(), &expected);
