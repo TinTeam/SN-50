@@ -3,14 +3,17 @@
     <a href="https://github.com/TinTeam/SN-50/actions?query=workflow%3A%22Continuous+Integration%22">
       <img src="https://img.shields.io/github/workflow/status/TinTeam/SN-50/Continuous Integration" alt="GitHub Workflow Status">
     </a>
+    <a href="https://coveralls.io/github/TinTeam/SN-50">
+      <img src="https://img.shields.io/coverallsCoverage/github/TinTeam/SN-50?branch=main" alt="Coveralls Status">
+    </a>
     <a href="https://crates.io/crates/sn-50">
       <img src="https://docs.rs/sn-50/badge.svg" alt="docs.rs">
     </a>
     <a href="https://crates.io/crates/sn-50">
-      <img src="https://img.shields.io/crates/d/sn-50" alt="Crates.io"">
+      <img src="https://img.shields.io/crates/d/sn-50" alt="crates.io">
     </a>
     <a href="https://github.com/TinTeam/SN-50/blob/master/LICENSE.txt">
-      <img src="https://img.shields.io/github/license/TinTeam/SN-50.svg" alt="MIT License Shield">
+      <img src="https://img.shields.io/github/license/TinTeam/SN-50.svg" alt="MIT License">
     </a>
   </p>
 
