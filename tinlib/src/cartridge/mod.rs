@@ -109,19 +109,19 @@ impl Cartridge {
                     break;
                 }
                 ChunkType::Cover => {
-                    cart.cover = chunk.data().clone();
+                    cart.cover.clone_from(chunk.data());
                 }
                 ChunkType::Code => {
                     cart.code = String::from_utf8(chunk.data().clone())?;
                 }
                 ChunkType::Font => {
-                    cart.font = chunk.data().clone();
+                    cart.font.clone_from(chunk.data());
                 }
                 ChunkType::Palette => {
-                    cart.palette = chunk.data().clone();
+                    cart.palette.clone_from(chunk.data());
                 }
                 ChunkType::Map => {
-                    cart.map = chunk.data().clone();
+                    cart.map.clone_from(chunk.data());
                 }
             }
         }

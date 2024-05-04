@@ -104,3 +104,29 @@ jobs:
 
       - name: Run test
         run: cargo test --all-targets --locked
+
+  coverage:
+    name: Coverage
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools
+
+      - name: Install llvm-cov
+        uses: taiki-e/install-action@v2.33.16
+        with:
+          tool: cargo-llvm-cov
+      - run: cargo llvm-cov --all-features --lcov --output-path lcov.info
+
+      - name: Upload coverage to coveralls
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: lcov.info

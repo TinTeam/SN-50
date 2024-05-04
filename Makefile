@@ -4,7 +4,7 @@ all: install fix test build
 
 install:
 	cargo install git-cliff --locked
-	cargo install cargo-tarpaulin --locked
+	cargo install cargo-llvm-cov --locked
 	pre-commit install
 
 pre-commit:
@@ -30,7 +30,7 @@ test:
 	cargo test --all-targets --locked
 
 test-cov:
-	cargo tarpaulin --all-targets --locked
+	cargo llvm-cov --all --locked
 
 build:
 	cargo build --all-targets --locked
