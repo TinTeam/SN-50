@@ -10,13 +10,13 @@ keywords = ["sn-50", "fantasy", "console", "computer"]
 categories = ["games", "game-development", "game-engines"]
 license = "MIT"
 readme = "README.md"
-edition = "2021"
-rust-version = "1.60.0"
+edition = "2024"
+rust-version = "1.85.0"
 
 [dependencies]
 byteorder = "^1.5"
 log = "^0.4"
-thiserror = "^1.0"
+thiserror = "^2.0"
 
 [dev-dependencies]
 assert_matches = "^1.5"

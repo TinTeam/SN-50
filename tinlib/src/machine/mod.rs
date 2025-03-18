@@ -36,7 +36,7 @@ pub struct Machine<'mem> {
     memory: Memory<'mem>,
 }
 
-impl<'mem> Machine<'mem> {
+impl Machine<'_> {
     /// Returns the current state.
     pub fn state(&self) -> MachineState {
         self.state
@@ -51,7 +51,7 @@ impl<'mem> Machine<'mem> {
     pub fn stop(&mut self) {}
 }
 
-impl<'mem> Default for Machine<'mem> {
+impl Default for Machine<'_> {
     /// Creates a new Machine in the `Created` state.
     fn default() -> Self {
         Self {
