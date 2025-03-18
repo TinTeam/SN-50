@@ -30,7 +30,7 @@ impl<'ram> Memory<'ram> {
     }
 }
 
-impl<'ram> Default for Memory<'ram> {
+impl Default for Memory<'_> {
     /// Creates a new Memory.
     fn default() -> Self {
         Self {

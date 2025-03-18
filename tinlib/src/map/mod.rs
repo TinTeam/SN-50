@@ -28,7 +28,7 @@ impl<'refs> Tile<'refs> {
     }
 }
 
-impl<'refs> fmt::Debug for Tile<'refs> {
+impl fmt::Debug for Tile<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Tile")
             .field("glyph", self.glyph)
@@ -124,7 +124,7 @@ impl<'tile> Map<'tile> {
     }
 }
 
-impl<'tile> Default for Map<'tile> {
+impl Default for Map<'_> {
     /// Creates a new empty Map.
     fn default() -> Self {
         Self {
