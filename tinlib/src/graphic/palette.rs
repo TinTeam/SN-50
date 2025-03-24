@@ -14,16 +14,16 @@ pub type PaletteColorIter<'iter> = slice::Iter<'iter, Color>;
 pub type PaletteColorIterMut<'iter> = slice::IterMut<'iter, Color>;
 
 /// A Palette representation with 16 colors.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Palette {
     /// Palette's colors.
-    pub colors: [Color; COLORS_IN_PALETTE],
+    colors: Box<[Color]>,
 }
 
 impl Palette {
     /// Returns the lenght.
     pub fn lenght(&self) -> usize {
-        COLORS_IN_PALETTE
+        self.colors.len()
     }
 
     /// Returns a color.
@@ -65,7 +65,7 @@ impl Default for Palette {
     /// Creates a Palette with all colors set to black.
     fn default() -> Self {
         Self {
-            colors: [Color::default(); COLORS_IN_PALETTE],
+            colors: Box::new([Color::default(); COLORS_IN_PALETTE]),
         }
     }
 }

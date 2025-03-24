@@ -14,17 +14,7 @@ impl Color {
         Self { red, green, blue }
     }
 
-    /// Creates a Color from a hexadecimal value.
-    pub fn new_from_hex(value: u32) -> Self {
-        Self {
-            red: ((value & 0x00ff_0000) >> 16) as u8,
-            green: ((value & 0x0000_ff00) >> 8) as u8,
-            blue: (value & 0x0000_00ff) as u8,
-        }
-    }
-
     /// Get red value.
-    ///
     pub fn red(self) -> u8 {
         self.red
     }
@@ -37,6 +27,16 @@ impl Color {
     /// Get blue value.
     pub fn blue(self) -> u8 {
         self.blue
+    }
+}
+
+impl From<u32> for Color {
+    fn from(value: u32) -> Self {
+        Self {
+            red: ((value & 0x00ff_0000) >> 16) as u8,
+            green: ((value & 0x0000_ff00) >> 8) as u8,
+            blue: (value & 0x0000_00ff) as u8,
+        }
     }
 }
 
@@ -65,9 +65,14 @@ mod tests {
         assert_eq!(color.blue, 3);
     }
 
+    /*************  ✨ Codeium Command ⭐  *************/
+    /// Tests the creation of a `Color` from a hexadecimal value, verifying that
+    /// the red, green, and blue components are correctly extracted.
+
+    /******  dab6841e-30d6-4b17-94f8-f522ec5fc1b1  *******/
     #[test]
     fn test_color_new_from_hex() {
-        let color = Color::new_from_hex(0x7bc950);
+        let color = Color::from(0x7bc950);
 
         assert_eq!(color.red, 123);
         assert_eq!(color.green, 201);
