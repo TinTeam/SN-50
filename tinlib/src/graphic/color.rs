@@ -3,30 +3,15 @@
 /// A color representation with red, green and blue values.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Color {
-    red: u8,
-    green: u8,
-    blue: u8,
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
 }
 
 impl Color {
     /// Creates a Color with red, green and blue values.
     pub fn new(red: u8, green: u8, blue: u8) -> Self {
         Self { red, green, blue }
-    }
-
-    /// Get red value.
-    pub fn red(self) -> u8 {
-        self.red
-    }
-
-    /// Get green value.
-    pub fn green(self) -> u8 {
-        self.green
-    }
-
-    /// Get blue value.
-    pub fn blue(self) -> u8 {
-        self.blue
     }
 }
 
@@ -65,11 +50,6 @@ mod tests {
         assert_eq!(color.blue, 3);
     }
 
-    /*************  ✨ Codeium Command ⭐  *************/
-    /// Tests the creation of a `Color` from a hexadecimal value, verifying that
-    /// the red, green, and blue components are correctly extracted.
-
-    /******  dab6841e-30d6-4b17-94f8-f522ec5fc1b1  *******/
     #[test]
     fn test_color_new_from_hex() {
         let color = Color::from(0x7bc950);
@@ -83,9 +63,9 @@ mod tests {
     fn test_color_red_green_blue() {
         let color = Color::new(1, 2, 3);
 
-        assert_eq!(color.red(), 1);
-        assert_eq!(color.green(), 2);
-        assert_eq!(color.blue(), 3);
+        assert_eq!(color.red, 1);
+        assert_eq!(color.green, 2);
+        assert_eq!(color.blue, 3);
     }
 
     #[test]

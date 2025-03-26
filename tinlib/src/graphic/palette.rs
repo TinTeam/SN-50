@@ -5,22 +5,29 @@ use std::slice;
 use crate::common::{CommonError, Result};
 use crate::graphic::color::Color;
 
-/// Number of colors in a Palette.
-const COLORS_IN_PALETTE: usize = 16;
+/// Default number of colors in a Palette.
+const NUM_COLORS_IN_PALETTE: usize = 16;
 
 /// A iterator over all palette colors.
 pub type PaletteColorIter<'iter> = slice::Iter<'iter, Color>;
 /// A mutable iterator over all palette colors.
 pub type PaletteColorIterMut<'iter> = slice::IterMut<'iter, Color>;
 
-/// A Palette representation with 16 colors.
+/// A Palette representation with N colors.
 #[derive(Clone)]
 pub struct Palette {
     /// Palette's colors.
-    colors: Box<[Color]>,
+    colors: Vec<Color>,
 }
 
 impl Palette {
+    /// Creates a new Palette.
+    pub fn new(num_colors: usize) -> Self {
+        Self {
+            colors: vec![Color::default(); num_colors],
+        }
+    }
+
     /// Returns the lenght.
     pub fn lenght(&self) -> usize {
         self.colors.len()
@@ -65,7 +72,7 @@ impl Default for Palette {
     /// Creates a Palette with all colors set to black.
     fn default() -> Self {
         Self {
-            colors: Box::new([Color::default(); COLORS_IN_PALETTE]),
+            colors: vec![Color::default(); NUM_COLORS_IN_PALETTE],
         }
     }
 }
@@ -78,6 +85,14 @@ impl fmt::Debug for Palette {
     }
 }
 
+impl From<&[Color]> for Palette {
+    fn from(colors: &[Color]) -> Self {
+        Self {
+            colors: colors.to_vec(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use assert_matches::assert_matches;
@@ -87,13 +102,13 @@ mod tests {
     #[test]
     fn test_palette_default() {
         let palette = Palette::default();
-        assert_eq!(palette.colors.len(), COLORS_IN_PALETTE);
+        assert_eq!(palette.colors.len(), NUM_COLORS_IN_PALETTE);
     }
 
     #[test]
     fn test_palette_len() {
         let palette = Palette::default();
-        assert_eq!(palette.lenght(), COLORS_IN_PALETTE);
+        assert_eq!(palette.lenght(), NUM_COLORS_IN_PALETTE);
     }
 
     #[test]
