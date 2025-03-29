@@ -6,10 +6,10 @@ use crate::common::{
     CommonError, Coord, CoordEnumerate, CoordEnumerateMut, CoordIter, Result, Size,
 };
 
-/// The Glyph width.
-pub const GLYPH_WIDTH: usize = 8;
-/// The Glyph height.
-pub const GLYPH_HEIGHT: usize = 8;
+/// The default Glyph width.
+pub const GLYPH_WIDTH: usize = 16;
+/// The default Glyph height.
+pub const GLYPH_HEIGHT: usize = 16;
 
 /// A Glyph pixel representation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -29,32 +29,31 @@ pub type GlyphPixelEnumerate<'iter> = CoordEnumerate<'iter, GlyphPixel>;
 /// A mutable enumeration iterator over all glyph pixels and their coords.
 pub type GlyphPixelEnumerateMut<'iter> = CoordEnumerateMut<'iter, GlyphPixel>;
 
-/// A Glyph representation with 8x8 Pixels.
-#[derive(Clone, Copy)]
+/// A Glyph representation with NxM Pixels.
+#[derive(Clone)]
 pub struct Glyph {
-    data: [GlyphPixel; GLYPH_WIDTH * GLYPH_HEIGHT],
+    size: Size,
+    data: Vec<GlyphPixel>,
 }
 
 impl Glyph {
-    /// Returns the width.
-    pub fn width(&self) -> usize {
-        GLYPH_WIDTH
-    }
-
-    /// Returns the height.
-    pub fn height(&self) -> usize {
-        GLYPH_HEIGHT
+    /// Creates a new Glyph.
+    pub fn new(size: Size) -> Self {
+        Self {
+            size,
+            data: vec![GlyphPixel::Empty; size.width() * size.height()],
+        }
     }
 
     /// Returns a Size.
     pub fn size(&self) -> Size {
-        Size::new(self.width(), self.height())
+        self.size
     }
 
     /// Returns a pixel.
     pub fn get_pixel(&self, coord: Coord) -> Result<GlyphPixel> {
         if !self.is_coord_valid(coord) {
-            return Err(CommonError::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size));
         }
 
         let index = self.get_index(coord);
@@ -64,7 +63,7 @@ impl Glyph {
     /// Sets a pixel.
     pub fn set_pixel(&mut self, coord: Coord, value: GlyphPixel) -> Result<()> {
         if !self.is_coord_valid(coord) {
-            return Err(CommonError::new_invalid_coord(coord, self.size()));
+            return Err(CommonError::new_invalid_coord(coord, self.size));
         }
 
         let index = self.get_index(coord);
@@ -99,11 +98,11 @@ impl Glyph {
     }
 
     fn is_coord_valid(&self, coord: Coord) -> bool {
-        coord.x < self.width() && coord.y < self.height()
+        coord.x < self.size.width() && coord.y < self.size.height()
     }
 
     fn get_index(&self, coord: Coord) -> usize {
-        coord.x * self.width() + coord.y
+        coord.x * self.size.width() + coord.y
     }
 }
 
@@ -111,7 +110,8 @@ impl Default for Glyph {
     /// Creates a Glyph with all pixels black.
     fn default() -> Self {
         Self {
-            data: [GlyphPixel::Empty; GLYPH_WIDTH * GLYPH_HEIGHT],
+            size: Size::new(GLYPH_WIDTH, GLYPH_HEIGHT),
+            data: vec![GlyphPixel::Empty; GLYPH_WIDTH * GLYPH_HEIGHT],
         }
     }
 }
@@ -147,11 +147,8 @@ mod tests {
     }
 
     #[test]
-    fn test_glyph_width_height_and_size() {
+    fn test_glyph_size() {
         let glyph = Glyph::default();
-
-        assert_eq!(glyph.width(), GLYPH_WIDTH);
-        assert_eq!(glyph.height(), GLYPH_HEIGHT);
         assert_eq!(glyph.size(), Size::new(GLYPH_WIDTH, GLYPH_HEIGHT));
     }
 
@@ -167,7 +164,7 @@ mod tests {
 
     #[test]
     fn test_glyph_get_pixel_invalid_coord() {
-        let coord = Coord::new(9, 1);
+        let coord = Coord::new(17, 1);
         let glyph = Glyph::default();
 
         let result = glyph.get_pixel(coord);
@@ -193,7 +190,7 @@ mod tests {
 
     #[test]
     fn test_glyph_set_pixel_invalid_coord() {
-        let coord = Coord::new(9, 1);
+        let coord = Coord::new(17, 1);
         let mut glyph = Glyph::default();
 
         let result = glyph.set_pixel(coord, GlyphPixel::Solid);
@@ -215,7 +212,7 @@ mod tests {
             assert_eq!(coord.y, y);
 
             y += 1;
-            if y == glyph.width() {
+            if y == glyph.size().width() {
                 y = 0;
                 x += 1;
             }
