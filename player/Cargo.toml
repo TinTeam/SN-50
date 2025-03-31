@@ -10,13 +10,13 @@ keywords = ["sn-50", "fantasy", "console", "computer"]
 categories = ["games", "game-development", "game-engines"]
 license = "MIT"
 readme = "README.md"
-edition = "2021"
-rust-version = "1.60.0"
+edition = "2024"
+rust-version = "1.85.0"
 
 [dependencies]
 tinlib = { version = "0.1.0", path = "../tinlib" }
-winit = { version = "0.29", default-features = false, features = [
-    "rwh_05",
+winit = { version = "0.30", default-features = false, features = [
+    "rwh_06",
     "x11",
     "wayland",
     "wayland-dlopen",
@@ -26,4 +26,4 @@ env_logger = "0.11"
 error-iter = "0.4"
 anyhow = "1.0"
 log = "0.4"
-pixels = "0.13"
+pixels = "0.15"
