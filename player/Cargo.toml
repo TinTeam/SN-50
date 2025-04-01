@@ -1,0 +1,29 @@
+[package]
+name = "sn-50-player"
+version = "0.1.0"
+authors = ["Luiz F. A. de Prá <rawarkanis@gmail.com>"]
+description = "The SN-50 Fantasy Computer player."
+homepage = "https://github.com/TinTeam/SN-50/"
+repository = "https://github.com/TinTeam/SN-50/"
+documentation = "https://docs.rs/sn-50/"
+keywords = ["sn-50", "fantasy", "console", "computer"]
+categories = ["games", "game-development", "game-engines"]
+license = "MIT"
+readme = "README.md"
+edition = "2024"
+rust-version = "1.85.0"
+
+[dependencies]
+tinlib = { version = "0.1.0", path = "../tinlib" }
+winit = { version = "0.30", default-features = false, features = [
+    "rwh_06",
+    "x11",
+    "wayland",
+    "wayland-dlopen",
+    "wayland-csd-adwaita",
+] }
+env_logger = "0.11"
+error-iter = "0.4"
+anyhow = "1.0"
+log = "0.4"
+pixels = "0.15"
